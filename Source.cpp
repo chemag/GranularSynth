@@ -1,10 +1,13 @@
-#include <stdio.h>
-#include <memory.h>
+#include <assert.h>
 #include <inttypes.h>
-#include <vector>
-#include <algorithm>
+#include <math.h>
+#include <memory.h>
+#include <stdio.h>
 #include <stdlib.h>
  
+#include <algorithm>
+#include <vector>
+
 // typedefs
 typedef uint16_t    uint16;
 typedef uint32_t    uint32;
@@ -12,6 +15,25 @@ typedef int32_t     int32;
 
 const float c_pi = 3.14159265359f;
  
+// https://stackoverflow.com/a/24207339
+#ifndef errno_t
+#define errno_t int
+#endif
+
+// define Microsoft non-portable functions
+// https://stackoverflow.com/a/1513215
+#ifndef fopen_s
+errno_t fopen_s(FILE **f, const char *name, const char *mode) {
+    errno_t ret = 0;
+    assert(f);
+    *f = fopen(name, mode);
+    /* Can't be sure about 1-to-1 mapping of errno and MS' errno_t */
+    if (!*f)
+        ret = errno;
+    return ret;
+}
+#endif
+
 //this struct is the minimal required header data for a wav file
 struct SMinimalWaveFileHeader
 {
@@ -49,7 +71,7 @@ inline void FloatToPCM(unsigned char *PCM, const float& in, size_t numBytes)
     // 8 bit is unsigned
     if (numBytes == 1)
     {
-        PCM[0] = unsigned char((in * 0.5f + 0.5f) * 255.0f);
+        PCM[0] = static_cast<unsigned char>((in * 0.5f + 0.5f) * 255.0f);
         return;
     }
 
@@ -323,7 +345,7 @@ inline float SampleChannelFractional (const std::vector<float>& input, float sam
     // This uses cubic hermite interpolation to get values between samples
 
     size_t sample = size_t(sampleFloat);
-    float sampleFraction = sampleFloat - std::floorf(sampleFloat);
+    float sampleFraction = sampleFloat - std::floor(sampleFloat);
 
     size_t sampleIndexNeg1 = (sample > 0) ? sample - 1 : sample;
     size_t sampleIndex0 = sample;
@@ -346,7 +368,7 @@ inline float SampleChannelFractional (const std::vector<float>& input, float sam
     // This uses linear interpolation to get values between samples.
 
     size_t sample = size_t(sampleFloat);
-    float sampleFraction = sampleFloat - std::floorf(sampleFloat);
+    float sampleFraction = sampleFloat - std::floor(sampleFloat);
 
     size_t sample1Index = sample * numChannels + channel;
     sample1Index = std::min(sample1Index, input.size() - 1);
@@ -645,7 +667,7 @@ int main(int argc, char **argv)
                 // time is 1
                 // pitch is 10hz from 0.75 to 1.25
                 timeMultiplier = 1.0f;
-                pitchMultiplier = 1.0f / ((std::sinf(percent * c_pi * 10.0f) * 0.5f + 0.5f) * 0.5f + 0.75f);
+                pitchMultiplier = 1.0f / ((std::sin(percent * c_pi * 10.0f) * 0.5f + 0.5f) * 0.5f + 0.75f);
             }
         );
         WriteWaveFile("data/out_E_Pitch.wav", out, numChannels, sampleRate, numBytes);
@@ -656,7 +678,7 @@ int main(int argc, char **argv)
             {
                 // time is 13hz from 0.5 to 2.5
                 // pitch is 1
-                timeMultiplier = (std::sinf(percent * c_pi * 13.0f) * 0.5f + 0.5f) * 2.0f + 0.5f;
+                timeMultiplier = (std::sin(percent * c_pi * 13.0f) * 0.5f + 0.5f) * 2.0f + 0.5f;
                 pitchMultiplier = 1.0f;
             }
         );
@@ -668,8 +690,8 @@ int main(int argc, char **argv)
             {
                 // time is 13hz from 0.5 to 2.5
                 // pitch is 10hz from 0.75 to 1.25
-                timeMultiplier = (std::sinf(percent * c_pi * 10.0f) * 0.5f + 0.5f) * 2.0f + 0.5f;
-                pitchMultiplier = 1.0f / ((std::sinf(percent * c_pi * 10.0f) * 0.5f + 0.5f) * 0.5f + 0.75f);
+                timeMultiplier = (std::sin(percent * c_pi * 10.0f) * 0.5f + 0.5f) * 2.0f + 0.5f;
+                pitchMultiplier = 1.0f / ((std::sin(percent * c_pi * 10.0f) * 0.5f + 0.5f) * 0.5f + 0.75f);
             }
         );
         WriteWaveFile("data/out_E_TimePitch.wav", out, numChannels, sampleRate, numBytes);

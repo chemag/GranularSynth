@@ -33,6 +33,7 @@
 *.lib
 
 # Executables
+source
 *.exe
 *.out
 *.app
