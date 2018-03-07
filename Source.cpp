@@ -564,42 +564,42 @@ int main(int argc, char **argv)
     uint32 sampleRate;
     uint16 numBytes;
     std::vector<float> source, out, sourceLeft, sourceRight;
-    ReadWaveFile("legend1.wav", source, numChannels, sampleRate, numBytes);
+    ReadWaveFile("data/legend1.wav", source, numChannels, sampleRate, numBytes);
 
     // speed up the audio and increase pitch
     {
         TimeAdjust(source, out, numChannels, 0.7f);
-        WriteWaveFile("out_A_FastHigh.wav", out, numChannels, sampleRate, numBytes);
+        WriteWaveFile("data/out_A_FastHigh.wav", out, numChannels, sampleRate, numBytes);
 
         TimeAdjust(source, out, numChannels, 0.4f);
-        WriteWaveFile("out_A_FasterHigher.wav", out, numChannels, sampleRate, numBytes);
+        WriteWaveFile("data/out_A_FasterHigher.wav", out, numChannels, sampleRate, numBytes);
     }
 
     // slow down the audio and decrease pitch
     {
         TimeAdjust(source, out, numChannels, 1.3f);
-        WriteWaveFile("out_A_SlowLow.wav", out, numChannels, sampleRate, numBytes);
+        WriteWaveFile("data/out_A_SlowLow.wav", out, numChannels, sampleRate, numBytes);
 
         TimeAdjust(source, out, numChannels, 2.1f);
-        WriteWaveFile("out_A_SlowerLower.wav", out, numChannels, sampleRate, numBytes);
+        WriteWaveFile("data/out_A_SlowerLower.wav", out, numChannels, sampleRate, numBytes);
     }
 
     // speed up audio without affecting pitch
     {
         GranularTimePitchAdjust(source, out, numChannels, sampleRate, 0.7f, 1.0f, 0.02f, 0.002f);
-        WriteWaveFile("out_B_Fast.wav", out, numChannels, sampleRate, numBytes);
+        WriteWaveFile("data/out_B_Fast.wav", out, numChannels, sampleRate, numBytes);
 
         GranularTimePitchAdjust(source, out, numChannels, sampleRate, 0.4f, 1.0f, 0.02f, 0.002f);
-        WriteWaveFile("out_B_Faster.wav", out, numChannels, sampleRate, numBytes);
+        WriteWaveFile("data/out_B_Faster.wav", out, numChannels, sampleRate, numBytes);
     }
 
     // slow down audio without affecting pitch
     {
         GranularTimePitchAdjust(source, out, numChannels, sampleRate, 1.3f, 1.0f, 0.02f, 0.002f);
-        WriteWaveFile("out_B_Slow.wav", out, numChannels, sampleRate, numBytes);
+        WriteWaveFile("data/out_B_Slow.wav", out, numChannels, sampleRate, numBytes);
 
         GranularTimePitchAdjust(source, out, numChannels, sampleRate, 2.1f, 1.0f, 0.02f, 0.002f);
-        WriteWaveFile("out_B_Slower.wav", out, numChannels, sampleRate, numBytes);
+        WriteWaveFile("data/out_B_Slower.wav", out, numChannels, sampleRate, numBytes);
     }
 
     // Make pitch higher without affecting length
@@ -608,32 +608,32 @@ int main(int argc, char **argv)
         std::vector<float> out2;
         GranularTimePitchAdjust(source, out2, numChannels, sampleRate, 1.0f / 0.7f, 1.0f, 0.02f, 0.002f);
         TimeAdjust(out2, out, numChannels, 0.7f);
-        WriteWaveFile("out_C_HighAlternate.wav", out, numChannels, sampleRate, numBytes);
+        WriteWaveFile("data/out_C_HighAlternate.wav", out, numChannels, sampleRate, numBytes);
 
         // do it in one step by changing grain playback speeds
         GranularTimePitchAdjust(source, out, numChannels, sampleRate, 1.0f, 1.0f / 0.7f, 0.02f, 0.002f);
-        WriteWaveFile("out_C_High.wav", out, numChannels, sampleRate, numBytes);
+        WriteWaveFile("data/out_C_High.wav", out, numChannels, sampleRate, numBytes);
 
         GranularTimePitchAdjust(source, out, numChannels, sampleRate, 1.0f, 1.0f / 0.4f, 0.02f, 0.002f);
-        WriteWaveFile("out_C_Higher.wav", out, numChannels, sampleRate, numBytes);
+        WriteWaveFile("data/out_C_Higher.wav", out, numChannels, sampleRate, numBytes);
     }
 
     // make pitch lower without affecting length
     {
         GranularTimePitchAdjust(source, out, numChannels, sampleRate, 1.0f, 1.0f / 1.3f, 0.02f, 0.002f);
-        WriteWaveFile("out_C_Low.wav", out, numChannels, sampleRate, numBytes);
+        WriteWaveFile("data/out_C_Low.wav", out, numChannels, sampleRate, numBytes);
 
         GranularTimePitchAdjust(source, out, numChannels, sampleRate, 1.0f, 1.0f / 2.1f, 0.02f, 0.002f);
-        WriteWaveFile("out_C_Lower.wav", out, numChannels, sampleRate, numBytes);
+        WriteWaveFile("data/out_C_Lower.wav", out, numChannels, sampleRate, numBytes);
     }
 
     // Make pitch lower but speed higher
     {
         GranularTimePitchAdjust(source, out, numChannels, sampleRate, 1.3f, 1.0f / 0.7f, 0.02f, 0.002f);
-        WriteWaveFile("out_D_SlowHigh.wav", out, numChannels, sampleRate, numBytes);
+        WriteWaveFile("data/out_D_SlowHigh.wav", out, numChannels, sampleRate, numBytes);
 
         GranularTimePitchAdjust(source, out, numChannels, sampleRate, 0.7f, 1.0f / 1.3f, 0.02f, 0.002f);
-        WriteWaveFile("out_D_FastLow.wav", out, numChannels, sampleRate, numBytes);
+        WriteWaveFile("data/out_D_FastLow.wav", out, numChannels, sampleRate, numBytes);
     }
 
     // dynamic tests which change time and pitch multipliers over time (for each input grain)
@@ -648,7 +648,7 @@ int main(int argc, char **argv)
                 pitchMultiplier = 1.0f / ((std::sinf(percent * c_pi * 10.0f) * 0.5f + 0.5f) * 0.5f + 0.75f);
             }
         );
-        WriteWaveFile("out_E_Pitch.wav", out, numChannels, sampleRate, numBytes);
+        WriteWaveFile("data/out_E_Pitch.wav", out, numChannels, sampleRate, numBytes);
 
         // adjust speed on a sine wave
         GranularTimePitchAdjustDynamic(source, out, numChannels, sampleRate, 0.02f, 0.002f,
@@ -660,7 +660,7 @@ int main(int argc, char **argv)
                 pitchMultiplier = 1.0f;
             }
         );
-        WriteWaveFile("out_E_Time.wav", out, numChannels, sampleRate, numBytes);
+        WriteWaveFile("data/out_E_Time.wav", out, numChannels, sampleRate, numBytes);
 
         // adjust time and speed on a sine wave
         GranularTimePitchAdjustDynamic(source, out, numChannels, sampleRate, 0.02f, 0.002f,
@@ -672,7 +672,7 @@ int main(int argc, char **argv)
                 pitchMultiplier = 1.0f / ((std::sinf(percent * c_pi * 10.0f) * 0.5f + 0.5f) * 0.5f + 0.75f);
             }
         );
-        WriteWaveFile("out_E_TimePitch.wav", out, numChannels, sampleRate, numBytes);
+        WriteWaveFile("data/out_E_TimePitch.wav", out, numChannels, sampleRate, numBytes);
     }
 
     system("pause");
