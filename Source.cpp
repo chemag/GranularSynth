@@ -180,7 +180,7 @@ bool ReadWaveFile(const char *fileName, std::vector<float>& data, uint16& numCha
         return false;
     size_t fileIndex = 0;
 
-	//make sure the main chunk ID is "RIFF"
+    //make sure the main chunk ID is "RIFF"
     if ((fileData.size() < fileIndex + 4) || memcmp(&fileData[fileIndex], "RIFF", 4))
     {
         printf("[-----ERROR-----]%s is an invalid input file. (1)\n", fileName);
@@ -188,8 +188,8 @@ bool ReadWaveFile(const char *fileName, std::vector<float>& data, uint16& numCha
     }
     fileIndex += 4;
 
-	//get the main chunk size
-	uint32 chunkSize;
+    //get the main chunk size
+    uint32 chunkSize;
     if (fileData.size() < fileIndex + 4)
     {
         printf("[-----ERROR-----]%s is an invalid input file. (2)\n", fileName);
@@ -198,7 +198,7 @@ bool ReadWaveFile(const char *fileName, std::vector<float>& data, uint16& numCha
     chunkSize = *(uint32*)&fileData[fileIndex];
     fileIndex += 4;
 
-	//make sure the format is "WAVE"
+    //make sure the format is "WAVE"
     if ((fileData.size() < fileIndex + 4) || memcmp(&fileData[fileIndex], "WAVE", 4))
     {
         printf("[-----ERROR-----]%s is an invalid input file. (3)\n", fileName);
@@ -206,10 +206,10 @@ bool ReadWaveFile(const char *fileName, std::vector<float>& data, uint16& numCha
     }
     fileIndex += 4;
 
-	size_t chunkPosFmt = -1;
-	size_t chunkPosData = -1;
-	while(chunkPosFmt == -1 || chunkPosData == -1)
-	{
+    size_t chunkPosFmt = -1;
+    size_t chunkPosData = -1;
+    while(chunkPosFmt == -1 || chunkPosData == -1)
+    {
         // get a chunk id and chunk size if we can
         if (fileData.size() < fileIndex + 8)
         {
@@ -223,25 +223,25 @@ bool ReadWaveFile(const char *fileName, std::vector<float>& data, uint16& numCha
         chunkSize = *(uint32*)&fileData[fileIndex];
         fileIndex += 4;
 
-		//if we hit a fmt
-		if(!memcmp(chunkID,"fmt ", 4))
-		{
-			chunkPosFmt = (long)(fileIndex - 8);
-		}
-		//else if we hit a data
-		else if(!memcmp(chunkID,"data", 4))
-		{
-			chunkPosData = (long)(fileIndex - 8);
-		}
+        //if we hit a fmt
+        if(!memcmp(chunkID,"fmt ", 4))
+        {
+            chunkPosFmt = (long)(fileIndex - 8);
+        }
+        //else if we hit a data
+        else if(!memcmp(chunkID,"data", 4))
+        {
+            chunkPosData = (long)(fileIndex - 8);
+        }
 
-		//skip to the next chunk
+        //skip to the next chunk
         fileIndex += chunkSize;
-	}
+    }
 
-	//we'll use this handy struct to load in 
-	SMinimalWaveFileHeader waveData;
+    //we'll use this handy struct to load in 
+    SMinimalWaveFileHeader waveData;
 
-	//load the fmt part if we can
+    //load the fmt part if we can
     fileIndex = chunkPosFmt;
     if (fileData.size() < fileIndex + 24)
     {
@@ -251,7 +251,7 @@ bool ReadWaveFile(const char *fileName, std::vector<float>& data, uint16& numCha
     memcpy(&waveData.m_subChunk1ID, &fileData[fileIndex], 24);
     fileIndex += 24;
 
-	//load the data part if we can
+    //load the data part if we can
     fileIndex = chunkPosData;
     if (fileData.size() < fileIndex + 8)
     {
@@ -261,45 +261,45 @@ bool ReadWaveFile(const char *fileName, std::vector<float>& data, uint16& numCha
     memcpy(&waveData.m_subChunk2ID, &fileData[fileIndex], 8);
     fileIndex += 8;
 
-	//verify a couple things about the file data
-	if(waveData.m_audioFormat != 1 ||       //only pcm data
-	   waveData.m_numChannels < 1 ||        //must have a channel
-	   waveData.m_numChannels > 2 ||        //must not have more than 2
-	   waveData.m_bitsPerSample > 32 ||     //32 bits per sample max
-	   waveData.m_bitsPerSample % 8 != 0 || //must be a multiple of 8 bites
-	   waveData.m_blockAlign > 8)           //blocks must be 8 bytes or lower
+    //verify a couple things about the file data
+    if(waveData.m_audioFormat != 1 ||       //only pcm data
+       waveData.m_numChannels < 1 ||        //must have a channel
+       waveData.m_numChannels > 2 ||        //must not have more than 2
+       waveData.m_bitsPerSample > 32 ||     //32 bits per sample max
+       waveData.m_bitsPerSample % 8 != 0 || //must be a multiple of 8 bites
+       waveData.m_blockAlign > 8)           //blocks must be 8 bytes or lower
     {
         printf("[-----ERROR-----]%s is an invalid input file. (7)\n", fileName);
         return false;
     }
 
-	//figure out how many samples and blocks there are total in the source data
+    //figure out how many samples and blocks there are total in the source data
     size_t bytesPerSample = waveData.m_blockAlign / waveData.m_numChannels;
     size_t numSourceSamples = waveData.m_subChunk2Size / bytesPerSample;
 
-	//allocate space for the source samples
+    //allocate space for the source samples
     data.resize(numSourceSamples);
 
-	//read in the source samples at whatever sample rate / number of channels it might be in
+    //read in the source samples at whatever sample rate / number of channels it might be in
     if (fileData.size() < fileIndex + numSourceSamples * bytesPerSample)
     {
         printf("[-----ERROR-----]%s is an invalid input file. (8)\n", fileName);
         return false;
     }
 
-	for(size_t nIndex = 0; nIndex < numSourceSamples; ++nIndex)
-	{	
+    for(size_t nIndex = 0; nIndex < numSourceSamples; ++nIndex)
+    {    
         PCMToFloat(data[nIndex], &fileData[fileIndex], bytesPerSample);
         fileIndex += bytesPerSample;
-	}
+    }
 
-	//return our data
+    //return our data
     numChannels = waveData.m_numChannels;
     sampleRate = waveData.m_sampleRate;
     numBytes = waveData.m_bitsPerSample / 8;
 
     printf("%s loaded.\n", fileName);
-	return true;
+    return true;
 }
 
 // Cubic hermite interpolation. More information available here: https://blog.demofox.org/2015/08/08/cubic-hermite-interpolation/
